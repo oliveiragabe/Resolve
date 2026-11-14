@@ -52,32 +52,6 @@ class _IssuesScreenState extends State<IssuesScreen> {
     super.dispose();
   }
 
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'aberto':
-        return 'Aberto';
-      case 'em_resolucao':
-        return 'Em resolução';
-      case 'fechado':
-        return 'Fechado';
-      default:
-        return status;
-    }
-  }
-
-  String _severityLabel(String severity) {
-    switch (severity) {
-      case 'baixa':
-        return 'Baixa';
-      case 'media':
-        return 'Média';
-      case 'critica':
-        return 'Crítica';
-      default:
-        return severity;
-    }
-  }
-
   List<Issue> _filterIssues(List<Issue> issues) {
     final search = _searchController.text.trim().toLowerCase();
 
