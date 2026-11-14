@@ -1,0 +1,45 @@
+
+@baseUrl = http://localhost:8000/api
+@issueId = 1
+
+### Listar ocorrências
+GET {{baseUrl}}/issues
+Accept: application/json
+
+###
+
+### Consultar ocorrência
+GET {{baseUrl}}/issues/{{issueId}}
+Accept: application/json
+
+###
+
+### Criar ocorrência
+POST {{baseUrl}}/issues
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title": "Erro ao salvar usuário",
+    "description": "O formulário não está salvando os dados.",
+    "project": "Resolve",
+    "severity": "critica"
+}
+
+###
+
+### Atualizar ocorrência
+PUT {{baseUrl}}/issues/{{issueId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title": "Erro ao salvar usuário - corrigido",
+    "status": "em_resolucao"
+}
+
+###
+
+### Excluir ocorrência
+DELETE {{baseUrl}}/issues/{{issueId}}
+Accept: application/json
