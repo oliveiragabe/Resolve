@@ -226,6 +226,19 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
                   padding: EdgeInsets.only(top: 12),
                   child: LinearProgressIndicator(),
                 ),
+
+              FilledButton.icon(
+                onPressed: () {
+                  context.goNamed(
+                    AppRoutes.issueEdit,
+                    pathParameters: {'id': issue.id.toString()},
+                  );
+                },
+                icon: const Icon(Icons.edit_outlined),
+                label: const Text('Editar ocorrência'),
+              ),
+              const SizedBox(height: 12),
+
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: _deleteIssue,

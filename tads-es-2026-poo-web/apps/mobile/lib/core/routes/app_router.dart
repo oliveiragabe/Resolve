@@ -32,5 +32,13 @@ final GoRouter appRouter = GoRouter(
       name: AppRoutes.issueForm,
       builder: (context, state) => const IssueFormScreen(),
     ),
+    GoRoute(
+      path: '/issues/:id/edit',
+      name: AppRoutes.issueEdit,
+      builder: (context, state) {
+        final id = int.parse(state.pathParameters['id']!);
+        return IssueFormScreen(issueId: id);
+      },
+    ),
   ],
 );
