@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widgets/issue_card.dart';
 import '../../core/routes/app_routes.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
@@ -170,38 +171,6 @@ class _IssuesScreenState extends State<IssuesScreen> {
     );
   }
 
-  Widget _buildIssueCard(Issue issue) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(
-          issue.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Projeto: ${issue.project}'),
-              const SizedBox(height: 4),
-              Text('Status: ${_statusLabel(issue.status)}'),
-              Text('Severidade: ${_severityLabel(issue.severity)}'),
-            ],
-          ),
-        ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          context.goNamed(
-            AppRoutes.issueDetails,
-            pathParameters: {'id': issue.id.toString()},
-          );
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -278,7 +247,17 @@ class _IssuesScreenState extends State<IssuesScreen> {
                     ),
                   )
                 else
-                  ...filteredIssues.map(_buildIssueCard),
+                  ...filteredIssues.map(
+                    (issue) => IssueCard(
+                      issue: issue,
+                      onTap: () {
+                        context.goNamed(
+                          AppRoutes.issueDetails,
+                          pathParameters: {'id': issue.id.toString()},
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
           );
