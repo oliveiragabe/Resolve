@@ -34,10 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: Analisar código
-        run: flutter analyze --no-fatal-infosdart format .
-git add .
-git commit -m "fix: ajustar análise estática do Flutter"
-git push origin main
+        run: flutter analyze --no-fatal-infos
 
       - name: Executar testes
         run: flutter test
