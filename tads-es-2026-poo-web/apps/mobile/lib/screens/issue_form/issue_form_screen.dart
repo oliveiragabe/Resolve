@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/issue_options.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/utils/validators.dart';
 import '../../models/issue.dart';
@@ -111,20 +113,20 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppDimensions.spacingXL),
         children: [
           Text(
             _isEditing ? 'Editar ocorrência' : 'Nova ocorrência',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingSM),
           Text(
             _isEditing
                 ? 'Atualize as informações da ocorrência.'
                 : 'Preencha os dados para registrar uma ocorrência.',
-            style: const TextStyle(color: Colors.grey),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           TextFormField(
             controller: _titleController,
@@ -135,7 +137,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
             ),
             validator: Validators.title,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingLG),
 
           TextFormField(
             controller: _descriptionController,
@@ -148,7 +150,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
             minLines: 3,
             maxLines: 5,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingLG),
 
           TextFormField(
             controller: _projectController,
@@ -159,7 +161,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
             ),
             validator: Validators.requiredField,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingLG),
 
           DropdownButtonFormField<String>(
             initialValue: _severity,
@@ -167,18 +169,19 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
               labelText: 'Severidade',
               prefixIcon: Icon(Icons.flag_outlined),
             ),
-            items: const [
-              DropdownMenuItem(value: 'baixa', child: Text('Baixa')),
-              DropdownMenuItem(value: 'media', child: Text('Média')),
-              DropdownMenuItem(value: 'critica', child: Text('Crítica')),
-            ],
+            items: IssueOptions.severities.map((option) {
+              return DropdownMenuItem<String>(
+                value: option['value'],
+                child: Text(option['label']!),
+              );
+            }).toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() => _severity = value);
               }
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingLG),
 
           DropdownButtonFormField<String>(
             initialValue: _status,
@@ -186,28 +189,26 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
               labelText: 'Status',
               prefixIcon: Icon(Icons.pending_outlined),
             ),
-            items: const [
-              DropdownMenuItem(value: 'aberto', child: Text('Aberto')),
-              DropdownMenuItem(
-                value: 'em_resolucao',
-                child: Text('Em resolução'),
-              ),
-              DropdownMenuItem(value: 'fechado', child: Text('Fechado')),
-            ],
+            items: IssueOptions.statuses.map((option) {
+              return DropdownMenuItem<String>(
+                value: option['value'],
+                child: Text(option['label']!),
+              );
+            }).toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() => _status = value);
               }
             },
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: AppDimensions.spacingXXXL),
 
           FilledButton.icon(
             onPressed: _isSaving ? null : _saveIssue,
             icon: _isSaving
                 ? const SizedBox(
-                    width: 18,
-                    height: 18,
+                    width: AppDimensions.iconSM,
+                    height: AppDimensions.iconSM,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.save_outlined),
@@ -215,7 +216,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
               _isEditing ? 'Salvar alterações' : 'Cadastrar ocorrência',
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingMD),
 
           OutlinedButton(
             onPressed: _isSaving ? null : () => context.pop(),

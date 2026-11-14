@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/constants/app_dimensions.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/routes/app_routes.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
@@ -65,9 +67,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.error_outline, size: 40),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
                   const Text('Erro ao carregar as ocorrências.'),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
                   ElevatedButton(
                     onPressed: _refreshIssues,
                     child: const Text('Tentar novamente'),
@@ -101,35 +103,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onRefresh: _refreshIssues,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppDimensions.spacingXL),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Painel geral',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppDimensions.spacingSM),
                   Text(
                     'Acompanhe as ocorrências dos seus projetos.',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface
-                          .withValues(alpha: 0.65),
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   _sectionTitle('Visão geral'),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
 
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+                    crossAxisSpacing: AppDimensions.spacingMD,
+                    mainAxisSpacing: AppDimensions.spacingMD,
                     childAspectRatio: 1.7,
                     children: [
                       _statCard(
@@ -151,28 +150,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   _sectionTitle('Severidade'),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
 
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppDimensions.spacingLG),
                       child: Row(
                         children: [
                           const Icon(
                             Icons.warning_amber_rounded,
                             color: Colors.redAccent,
-                            size: 28,
+                            size: AppDimensions.iconLG,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacingMD),
                           const Expanded(child: Text('Ocorrências críticas')),
                           Text(
                             criticalIssues.toString(),
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: AppDimensions.fontXL,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -181,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,12 +195,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
 
                   if (recentIssues.isEmpty)
                     const Card(
                       child: Padding(
-                        padding: EdgeInsets.all(20),
+                        padding: EdgeInsets.all(AppDimensions.spacingXL),
                         child: Center(
                           child: Text('Nenhuma ocorrência cadastrada.'),
                         ),
@@ -220,7 +219,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   SizedBox(
                     width: double.infinity,
@@ -233,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
 
                   SizedBox(
                     width: double.infinity,
@@ -255,32 +254,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _sectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    );
+    return Text(title, style: Theme.of(context).textTheme.titleMedium);
   }
 
   Widget _statCard(String title, int value, IconData icon) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppDimensions.spacingMD),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
+            Icon(icon, color: AppTheme.primary, size: AppDimensions.iconMD),
             Text(
               value.toString(),
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              title,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface
-                    .withValues(alpha: 0.7),
+              style: const TextStyle(
+                fontSize: AppDimensions.fontXL,
+                fontWeight: FontWeight.bold,
               ),
             ),
+            Text(title, style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
       ),

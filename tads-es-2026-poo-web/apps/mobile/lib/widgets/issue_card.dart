@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/constants/app_dimensions.dart';
+import '../core/theme/app_theme.dart';
 import '../models/issue.dart';
 
 class IssueCard extends StatelessWidget {
@@ -43,7 +45,7 @@ class IssueCard extends StatelessWidget {
       case 'critica':
         return Colors.redAccent;
       default:
-        return Colors.grey;
+        return AppTheme.textSecondary;
     }
   }
 
@@ -52,35 +54,44 @@ class IssueCard extends StatelessWidget {
     final severityColor = _severityColor(issue.severity);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingMD),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
+        contentPadding: const EdgeInsets.all(AppDimensions.spacingLG),
         onTap: onTap,
         title: Text(
           issue.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleMedium,
         ),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: AppDimensions.spacingSM),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Projeto: ${issue.project}'),
-              const SizedBox(height: 6),
-              Text('Status: ${_statusLabel(issue.status)}'),
-              const SizedBox(height: 6),
+              Text(
+                'Projeto: ${issue.project}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              Text(
+                'Status: ${_statusLabel(issue.status)}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
               Row(
                 children: [
                   Container(
-                    width: 8,
-                    height: 8,
+                    width: AppDimensions.spacingSM,
+                    height: AppDimensions.spacingSM,
                     decoration: BoxDecoration(
                       color: severityColor,
                       shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Text('Severidade: ${_severityLabel(issue.severity)}'),
+                  const SizedBox(width: AppDimensions.spacingSM),
+                  Text(
+                    'Severidade: ${_severityLabel(issue.severity)}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ],
               ),
             ],

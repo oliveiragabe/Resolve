@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../widgets/issue_card.dart';
+import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/issue_options.dart';
 import '../../core/routes/app_routes.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
+import '../../widgets/issue_card.dart';
 
 class IssuesScreen extends StatefulWidget {
   const IssuesScreen({super.key});
@@ -90,21 +92,21 @@ class _IssuesScreenState extends State<IssuesScreen> {
                 : null,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDimensions.spacingMD),
         Row(
           children: [
             Expanded(
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedStatus,
                 decoration: const InputDecoration(labelText: 'Status'),
-                items: const [
-                  DropdownMenuItem(value: 'todos', child: Text('Todos')),
-                  DropdownMenuItem(value: 'aberto', child: Text('Aberto')),
-                  DropdownMenuItem(
-                    value: 'em_resolucao',
-                    child: Text('Em resolução'),
+                items: [
+                  const DropdownMenuItem(value: 'todos', child: Text('Todos')),
+                  ...IssueOptions.statuses.map(
+                    (option) => DropdownMenuItem<String>(
+                      value: option['value'],
+                      child: Text(option['label']!),
+                    ),
                   ),
-                  DropdownMenuItem(value: 'fechado', child: Text('Fechado')),
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -113,16 +115,19 @@ class _IssuesScreenState extends State<IssuesScreen> {
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingMD),
             Expanded(
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedSeverity,
                 decoration: const InputDecoration(labelText: 'Severidade'),
-                items: const [
-                  DropdownMenuItem(value: 'todas', child: Text('Todas')),
-                  DropdownMenuItem(value: 'baixa', child: Text('Baixa')),
-                  DropdownMenuItem(value: 'media', child: Text('Média')),
-                  DropdownMenuItem(value: 'critica', child: Text('Crítica')),
+                items: [
+                  const DropdownMenuItem(value: 'todas', child: Text('Todas')),
+                  ...IssueOptions.severities.map(
+                    (option) => DropdownMenuItem<String>(
+                      value: option['value'],
+                      child: Text(option['label']!),
+                    ),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) {
@@ -175,9 +180,9 @@ class _IssuesScreenState extends State<IssuesScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.error_outline, size: 40),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
                   const Text('Não foi possível carregar as ocorrências.'),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
                   ElevatedButton(
                     onPressed: _refreshIssues,
                     child: const Text('Tentar novamente'),
@@ -193,18 +198,20 @@ class _IssuesScreenState extends State<IssuesScreen> {
           return RefreshIndicator(
             onRefresh: _refreshIssues,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacingLG),
               children: [
                 _buildFilters(),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingMD),
                 Text(
                   '${filteredIssues.length} ocorrência(s) encontrada(s)',
-                  style: const TextStyle(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingMD),
                 if (filteredIssues.isEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 48),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppDimensions.spacingXXXL + 20,
+                    ),
                     child: Column(
                       children: [
                         const Icon(
@@ -212,7 +219,7 @@ class _IssuesScreenState extends State<IssuesScreen> {
                           size: 44,
                           color: Colors.grey,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppDimensions.spacingMD),
                         Text(
                           issues.isEmpty ? 'Nenhuma ocorrência cadastrada.' : 'Nenhuma ocorrência encontrada com esses filtros.',
                           textAlign: TextAlign.center,

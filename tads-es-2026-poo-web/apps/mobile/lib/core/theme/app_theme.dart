@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../constants/app_dimensions.dart';
+
 class AppTheme {
+  // Cores
   static const Color background = Color(0xFF0D0D12);
   static const Color surface = Color(0xFF17171F);
   static const Color primary = Color(0xFF8B5CF6);
@@ -8,11 +11,34 @@ class AppTheme {
   static const Color textSecondary = Color(0xFFA1A1AA);
   static const Color border = Color(0xFF292934);
 
+  // Tipografia
+  static const TextTheme textTheme = TextTheme(
+    headlineSmall: TextStyle(
+      fontSize: AppDimensions.fontXXL,
+      fontWeight: FontWeight.bold,
+      color: textPrimary,
+    ),
+    titleLarge: TextStyle(
+      fontSize: AppDimensions.fontXL,
+      fontWeight: FontWeight.bold,
+      color: textPrimary,
+    ),
+    titleMedium: TextStyle(
+      fontSize: AppDimensions.fontLG,
+      fontWeight: FontWeight.w600,
+      color: textPrimary,
+    ),
+    bodyLarge: TextStyle(fontSize: AppDimensions.fontMD, color: textPrimary),
+    bodyMedium: TextStyle(fontSize: AppDimensions.fontMD, color: textSecondary),
+    bodySmall: TextStyle(fontSize: AppDimensions.fontSM, color: textSecondary),
+  );
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: background,
+      textTheme: textTheme,
       colorScheme: const ColorScheme.dark(
         primary: primary,
         surface: surface,
@@ -27,7 +53,7 @@ class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
           side: const BorderSide(color: border),
         ),
       ),
@@ -35,11 +61,11 @@ class AppTheme {
         filled: true,
         fillColor: surface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           borderSide: const BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           borderSide: const BorderSide(color: border),
         ),
       ),

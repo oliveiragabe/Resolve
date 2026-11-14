@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/issue_options.dart';
 import '../../core/routes/app_routes.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
@@ -37,16 +39,10 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
   }
 
   String _severityLabel(String severity) {
-    switch (severity) {
-      case 'baixa':
-        return 'Baixa';
-      case 'media':
-        return 'Média';
-      case 'critica':
-        return 'Crítica';
-      default:
-        return severity;
-    }
+    return IssueOptions.severities.firstWhere(
+      (option) => option['value'] == severity,
+      orElse: () => {'label': severity},
+    )['label']!;
   }
 
   Future<void> _updateStatus(Issue issue, String status) async {
@@ -130,18 +126,16 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
   Widget _infoCard(String label, String value) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacingLG),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
-            ),
-            const SizedBox(height: 6),
+            Text(label, style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               value,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: Theme.of(context).textTheme.bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -166,7 +160,7 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('Não foi possível carregar a ocorrência.'),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingMD),
                   ElevatedButton(
                     onPressed: () {
                       setState(_loadIssue);
@@ -181,13 +175,14 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
           final issue = snapshot.data!;
 
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingLG),
             children: [
               Text(
                 issue.title,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacingLG),
+
               _infoCard('Projeto', issue.project),
               _infoCard('Severidade', _severityLabel(issue.severity)),
               _infoCard(
@@ -196,23 +191,24 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
                     ? issue.description!
                     : 'Sem descrição informada.',
               ),
-              const SizedBox(height: 16),
-              const Text(
+
+              const SizedBox(height: AppDimensions.spacingLG),
+
+              Text(
                 'Status da ocorrência',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingSM),
+
               DropdownButtonFormField<String>(
                 initialValue: issue.status,
                 decoration: const InputDecoration(labelText: 'Status'),
-                items: const [
-                  DropdownMenuItem(value: 'aberto', child: Text('Aberto')),
-                  DropdownMenuItem(
-                    value: 'em_resolucao',
-                    child: Text('Em resolução'),
-                  ),
-                  DropdownMenuItem(value: 'fechado', child: Text('Fechado')),
-                ],
+                items: IssueOptions.statuses.map((option) {
+                  return DropdownMenuItem<String>(
+                    value: option['value'],
+                    child: Text(option['label']!),
+                  );
+                }).toList(),
                 onChanged: _isUpdating
                     ? null
                     : (status) {
@@ -221,11 +217,14 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
                         }
                       },
               ),
+
               if (_isUpdating)
                 const Padding(
-                  padding: EdgeInsets.only(top: 12),
+                  padding: EdgeInsets.only(top: AppDimensions.spacingMD),
                   child: LinearProgressIndicator(),
                 ),
+
+              const SizedBox(height: AppDimensions.spacingLG),
 
               FilledButton.icon(
                 onPressed: () {
@@ -237,9 +236,9 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
                 icon: const Icon(Icons.edit_outlined),
                 label: const Text('Editar ocorrência'),
               ),
-              const SizedBox(height: 12),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXXL),
+
               OutlinedButton.icon(
                 onPressed: _deleteIssue,
                 icon: const Icon(Icons.delete_outline),
