@@ -313,9 +313,6 @@ A suíte contempla testes de unidade e de widgets para modelos, validações, se
 
 - **Repositório:** https://github.com/oliveiragabe/Resolve
 - **Aplicação publicada:** https://resolve-mobile-sage.vercel.app
-- **Vídeo demonstrativo:** adicionar o link do vídeo de 3 a 5 minutos antes da entrega no Moodle.
-
-O vídeo deve demonstrar as telas e o CRUD funcionando, incluindo a persistência das alterações no back-end.
 
 ## Observações
 
