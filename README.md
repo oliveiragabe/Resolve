@@ -1,25 +1,32 @@
 # Resolve
 
-Aplicativo de gerenciamento de ocorrências e bugs de projetos de software. O Resolve permite registrar problemas, acompanhar seu status e severidade, consultar detalhes, editar informações e excluir ocorrências.
+Aplicação web responsiva para gerenciamento de ocorrências e bugs em projetos de software. O Resolve permite registrar problemas, acompanhar status e severidade, consultar detalhes, editar informações e excluir ocorrências.
+
+**Aplicação em produção:** https://resolve-mobile-sage.vercel.app  
+**API em produção:** https://resolve-api-1evi.onrender.com  
+**Repositório:** https://github.com/oliveiragabe/Resolve
 
 ## Informações acadêmicas
 
 - **Aluno:** Gabriel
-- **Back-end escolhido:** Opção A — API Laravel
+- **Disciplinas:** Programação para Dispositivos Móveis, Programação Orientada a Objetos para Web e Paradigmas de Linguagem de Programação
+- **Back-end escolhido para o trabalho mobile:** Opção A — API Laravel
 - **Aplicativo:** Flutter e Dart
 - **Back-end:** Laravel e PHP
-- **Banco de dados:** SQLite
+- **Banco de dados de produção:** PostgreSQL (Supabase)
 
 ## Sobre o projeto
 
 O Resolve foi desenvolvido como trabalho final integrado das disciplinas de Programação para Dispositivos Móveis, Programação Orientada a Objetos para Web e Paradigmas de Linguagem de Programação.
 
-O aplicativo Flutter consome uma API REST desenvolvida em Laravel. Os dados das ocorrências são persistidos no banco SQLite e carregados pela aplicação por meio de requisições HTTP.
+A aplicação Flutter consome uma API REST desenvolvida em Laravel por meio de requisições HTTP e troca de dados em JSON. A API organiza as operações em Controller, Service e Repository, enquanto o aplicativo mobile separa modelos, serviços, telas, widgets e recursos compartilhados.
+
+Em produção, o Flutter Web está hospedado na Vercel, a API Laravel no Render e o banco PostgreSQL no Supabase.
 
 ## Funcionalidades
 
 - Cadastro de ocorrências.
-- Listagem de ocorrências.
+- Listagem de ocorrências carregadas da API.
 - Consulta dos detalhes de uma ocorrência.
 - Edição de título, descrição, projeto, severidade e status.
 - Exclusão de ocorrências.
@@ -28,7 +35,7 @@ O aplicativo Flutter consome uma API REST desenvolvida em Laravel. Os dados das 
 - Filtros por status e severidade.
 - Dashboard com indicadores e ocorrências recentes.
 - Validação dos formulários.
-- Tratamento dos estados de carregamento, erro e lista vazia.
+- Tratamento de carregamento, erros e lista vazia.
 
 ### Status disponíveis
 
@@ -42,34 +49,48 @@ O aplicativo Flutter consome uma API REST desenvolvida em Laravel. Os dados das 
 - Média
 - Crítica
 
+## Telas e rotas
+
+| Tela | Rota | Descrição |
+|---|---|---|
+| Dashboard | `/` | Indicadores gerais e ocorrências recentes |
+| Listagem de ocorrências | `/issues` | Lista, pesquisa e filtros |
+| Nova ocorrência | `/issues/new` | Formulário de cadastro |
+| Detalhes da ocorrência | `/issues/:id` | Consulta, alteração de status e exclusão |
+| Editar ocorrência | `/issues/:id/edit` | Formulário de edição |
+
+A navegação é gerenciada pelo pacote `go_router`, com nomes de rotas centralizados em `core/routes/app_routes.dart` e configuração em `core/routes/app_router.dart`.
+
 ## Tecnologias utilizadas
 
 ### Aplicativo Flutter
 
-- **Flutter e Dart:** desenvolvimento da aplicação.
-- **go_router:** navegação por rotas nomeadas.
-- **http:** comunicação HTTP com a API.
-- **Material Design:** componentes e interface.
+- **Flutter e Dart:** construção da interface e lógica do aplicativo.
+- **go_router:** navegação e gerenciamento das rotas.
+- **http:** comunicação com a API REST.
+- **Material Design:** componentes visuais.
+- **flutter_test:** testes automatizados de unidade e widgets.
 
 ### API Laravel
 
-- **PHP e Laravel:** implementação do back-end.
-- **SQLite:** persistência dos dados.
-- **API REST:** comunicação em JSON.
+- **PHP e Laravel:** implementação da API.
+- **Eloquent ORM:** persistência e consulta dos registros.
+- **PostgreSQL:** banco de dados utilizado em produção.
+- **API REST:** operações CRUD e respostas em JSON.
 
-## Estrutura do projeto
+### Infraestrutura de produção
 
-O código está organizado dentro de `tads-es-2026-poo-web/apps/`:
+| Componente | Serviço |
+|---|---|
+| Aplicativo Flutter Web | Vercel |
+| API Laravel | Render |
+| Banco de dados PostgreSQL | Supabase |
 
-```text
-Resolve/
-└── tads-es-2026-poo-web/
-    └── apps/
-        ├── api/       # API Laravel
-        └── mobile/    # Aplicativo Flutter
-```
+## Arquitetura e organização
 
-### Estrutura do Flutter
+### Aplicativo Flutter
+
+A estrutura segue a organização em camadas definida para a disciplina de Programação para Dispositivos Móveis:
 
 ```text
 apps/mobile/lib/
@@ -86,108 +107,39 @@ apps/mobile/lib/
 └── widgets/
 ```
 
-### Organização em camadas
+Responsabilidades das camadas:
 
-No aplicativo Flutter:
+- **Models:** representam as entidades e fazem a conversão dos dados JSON por meio de métodos como `fromJson` e `toJson`.
+- **Services:** centralizam as requisições HTTP e retornam models para as telas.
+- **Screens:** apresentam as funcionalidades e acessam os dados por meio dos services, sem realizar chamadas HTTP diretamente.
+- **Widgets:** reúnem componentes reutilizáveis.
+- **Core:** concentra constantes, rotas, tema, dimensões e validações.
 
-- **Models:** representam as entidades e realizam a conversão dos dados JSON.
-- **Services:** centralizam a comunicação com a API e retornam os models.
-- **Screens:** apresentam as telas e controlam a interação do usuário por meio dos services.
-- **Widgets:** concentram componentes reutilizáveis.
-- **Core:** reúne constantes, rotas, tema e validações.
+### API Laravel
 
-No back-end Laravel:
+A API utiliza separação de responsabilidades em Controller, Service e Repository:
 
-- **Models:** representam as entidades e os dados persistidos.
-- **Repositories:** concentram as operações de acesso ao banco de dados.
-- **Services:** organizam as operações e regras da aplicação.
-- **Controllers:** recebem as requisições HTTP, validam os dados e retornam respostas JSON.
-
-## Telas e rotas
-
-| Tela | Rota | Descrição |
-|---|---|---|
-| Dashboard | `/` | Indicadores gerais e ocorrências recentes |
-| Ocorrências | `/issues` | Listagem, pesquisa e filtros |
-| Detalhes | `/issues/:id` | Informações, alteração de status e exclusão |
-| Nova ocorrência | `/issues/new` | Cadastro de uma ocorrência |
-| Editar ocorrência | `/issues/:id/edit` | Edição de uma ocorrência existente |
-
-A navegação utiliza o pacote `go_router`, com nomes de rotas definidos em `core/routes/`.
-
-## Como executar o projeto
-
-Os passos abaixo consideram um ambiente com Flutter, Dart, PHP, Composer e as dependências do Laravel instaladas.
-
-### 1. Clonar o repositório
-
-```bash
-git clone https://github.com/oliveiragabe/Resolve.git
-cd Resolve
+```text
+apps/api/app/
+├── Http/
+│   ├── Controllers/
+│   │   └── IssueController.php
+│   ├── Services/
+│   │   └── IssueService.php
+│   └── Repositories/
+│       └── IssueRepository.php
+└── Models/
+    └── Issue.php
 ```
 
-### 2. Configurar e executar a API Laravel
+Responsabilidades das camadas:
 
-Acesse a pasta da API:
+- **Models:** representam as entidades persistidas e definem os campos preenchíveis.
+- **Controllers:** recebem as requisições HTTP, validam os dados de entrada e retornam respostas JSON com os códigos HTTP apropriados.
+- **Services:** coordenam as operações da aplicação e delegam o acesso aos dados ao Repository.
+- **Repositories:** concentram as operações de consulta, criação, atualização e exclusão no banco de dados.
 
-```bash
-cd tads-es-2026-poo-web/apps/api
-composer install
-```
-
-Se ainda não existir um arquivo `.env`, crie-o a partir do exemplo:
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-No arquivo `.env`, confirme a configuração do SQLite:
-
-```env
-DB_CONNECTION=sqlite
-```
-
-O Laravel utiliza por padrão o arquivo `database/database.sqlite`. Crie-o caso ainda não exista e execute as migrations:
-
-```bash
-touch database/database.sqlite
-php artisan migrate
-```
-
-Inicie o servidor:
-
-```bash
-php artisan serve --host=0.0.0.0 --port=8000
-```
-
-A API ficará disponível na porta **8000**.
-
-### 3. Configurar a URL da API no Flutter
-
-No GitHub Codespaces, abra a aba **Ports** e copie a URL encaminhada para a porta 8000.
-
-No arquivo:
-
-`tads-es-2026-poo-web/apps/mobile/lib/core/constants/api_constants.dart`
-
-Atualize o valor de `baseUrl` com a URL do seu ambiente. Informe somente a URL base, sem acrescentar `/api/issues`, pois o endpoint é montado pela constante `ApiConstants.issues`.
-
-A URL encaminhada pelo Codespaces pode mudar entre ambientes.
-
-### 4. Executar o aplicativo Flutter
-
-Em outro terminal, acesse a pasta mobile:
-
-```bash
-cd tads-es-2026-poo-web/apps/mobile
-flutter pub get
-flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8080
-```
-
-Encaminhe também a porta **8080** na aba **Ports** do Codespaces e abra a URL disponibilizada para visualizar o aplicativo no navegador.
-
-> Mantenha o servidor Laravel em execução enquanto utiliza o aplicativo, pois o Flutter consome os dados diretamente da API.
+Esse desenho reduz o acoplamento entre as responsabilidades e facilita a manutenção e reutilização do código.
 
 ## API REST
 
@@ -211,6 +163,81 @@ Os dados são enviados e recebidos em JSON.
 - `severity`: gravidade (`baixa`, `media` ou `critica`).
 - `status`: situação (`aberto`, `em_resolucao` ou `fechado`).
 
+## Como executar localmente
+
+Pré-requisitos:
+
+- Flutter SDK e Dart.
+- PHP e Composer.
+- Banco de dados compatível com a configuração do Laravel.
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/oliveiragabe/Resolve.git
+cd Resolve
+```
+
+### 2. Configurar a API Laravel
+
+Acesse a pasta da API:
+
+```bash
+cd tads-es-2026-poo-web/apps/api
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Configure no arquivo `.env` a conexão com o banco de dados que será utilizado no ambiente local. Para utilizar SQLite, por exemplo:
+
+```env
+DB_CONNECTION=sqlite
+```
+
+Crie o arquivo do banco, caso ainda não exista, e execute as migrations:
+
+```bash
+touch database/database.sqlite
+php artisan migrate
+```
+
+Inicie a API:
+
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+A API ficará disponível em `http://localhost:8000`.
+
+### 3. Configurar a URL da API no Flutter
+
+No arquivo:
+
+`tads-es-2026-poo-web/apps/mobile/lib/core/constants/api_constants.dart`
+
+Configure `ApiConstants.baseUrl` com a URL base da API do seu ambiente. Para execução local, utilize:
+
+```dart
+static const String baseUrl = 'http://localhost:8000';
+```
+
+O endpoint `/api/issues` é acrescentado pela constante `ApiConstants.issues`.
+
+Se estiver executando o Flutter em um dispositivo físico ou em outro ambiente, utilize um endereço de API acessível por esse dispositivo/ambiente.
+
+### 4. Executar o aplicativo Flutter
+
+Em outro terminal:
+
+```bash
+cd tads-es-2026-poo-web/apps/mobile
+flutter pub get
+flutter run -d chrome
+```
+
+Mantenha a API Laravel em execução enquanto utiliza o aplicativo.
+
 ## Testes e análise
 
 Na pasta `tads-es-2026-poo-web/apps/mobile`, execute:
@@ -227,25 +254,62 @@ Executar a análise estática:
 flutter analyze
 ```
 
-Executar os testes:
+Executar os testes automatizados:
 
 ```bash
 flutter test
 ```
 
-A suíte de testes contempla testes de unidade e de widgets para models, validações, services e telas.
+A suíte contempla testes de unidade e de widgets para modelos, validações, serviços e telas. **Na última execução registrada durante o desenvolvimento, os 43 testes passaram.**
 
-**Última execução registrada durante o desenvolvimento: 43 testes aprovados.**
+## Relação com os requisitos das disciplinas
+
+### Programação para Dispositivos Móveis
+
+| Requisito da atividade | Implementação no Resolve |
+|---|---|
+| Aplicativo em Flutter/Dart | Aplicativo desenvolvido em Flutter e Dart |
+| Consumo de back-end real — Opção A | Consumo da API REST Laravel por HTTP |
+| CRUD completo de uma entidade | Cadastro, listagem, consulta, edição e exclusão de ocorrências |
+| Arquitetura em camadas | Separação em core, models, services, screens e widgets |
+| Models com conversão JSON | `Issue.fromJson` e `Issue.toJson` |
+| Navegação com go_router e rotas nomeadas | Rotas centralizadas em `core/routes/` |
+| Mínimo de quatro telas com funções distintas | Dashboard, listagem, formulário e detalhes; cadastro e edição utilizam o formulário em contextos distintos |
+| Programação assíncrona | Requisições HTTP com `async/await` e Futures |
+| Estados de carregamento, erro e lista vazia | Tratamento nas telas que carregam dados da API |
+| Validação centralizada | Validadores em `core/utils/` |
+| Tema próprio | `ThemeData` centralizado em `core/theme/` |
+| Testes | Testes automatizados de unidade e widgets |
+
+### Paradigmas de Linguagem de Programação
+
+| Aspecto avaliado | Implementação no Resolve |
+|---|---|
+| Arquitetura do sistema | Aplicativo e API organizados em camadas |
+| Reutilização de funções e componentes | Widgets compartilhados e operações centralizadas nos services |
+| Uso adequado da camada Services | `IssueService` no Flutter e `IssueService` no Laravel |
+| Uso adequado da camada Repositories | `IssueRepository` concentra o acesso aos dados no Laravel |
+| Separação de responsabilidades e boas práticas | Controller valida e responde HTTP; Service coordena; Repository acessa os dados; Model representa a entidade |
 
 ## Capturas de tela
 
-As capturas de tela da aplicação serão adicionadas aqui:
+Adicione nesta seção imagens reais das principais telas da aplicação:
 
 - Dashboard
 - Listagem de ocorrências
 - Detalhes da ocorrência
-- Formulário de cadastro e edição
+- Cadastro e edição de ocorrência
 
-## Repositório
+## Entrega acadêmica
 
-[GitHub — oliveiragabe/Resolve](https://github.com/oliveiragabe/Resolve)
+- **Repositório:** https://github.com/oliveiragabe/Resolve
+- **Aplicação publicada:** https://resolve-mobile-sage.vercel.app
+- **Vídeo demonstrativo:** adicionar o link do vídeo de 3 a 5 minutos antes da entrega no Moodle.
+
+O vídeo deve demonstrar as telas e o CRUD funcionando, incluindo a persistência das alterações no back-end.
+
+## Observações
+
+- Não publique arquivos `.env`, senhas, tokens ou credenciais de serviços.
+- Para executar localmente, configure a URL da API e as variáveis de ambiente do Laravel para o seu próprio ambiente.
+- A infraestrutura de produção utiliza variáveis de ambiente configuradas diretamente nos serviços de hospedagem.
