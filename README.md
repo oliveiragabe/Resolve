@@ -293,12 +293,21 @@ A suíte contempla testes de unidade e de widgets para modelos, validações, se
 
 ## Capturas de tela
 
-Adicione nesta seção imagens reais das principais telas da aplicação:
+### Dashboard
 
-- Dashboard
-- Listagem de ocorrências
-- Detalhes da ocorrência
-- Cadastro e edição de ocorrência
+![Dashboard do Resolve](screenshots/dashboard.png)
+
+### Listagem de ocorrências
+
+![Listagem de ocorrências do Resolve](screenshots/listagem.png)
+
+### Detalhes da ocorrência
+
+![Detalhes da ocorrência no Resolve](screenshots/detalhes.png)
+
+### Cadastro de ocorrência
+
+![Formulário de cadastro de ocorrência no Resolve](screenshots/cadastro.png)
 
 ## Entrega acadêmica
 
