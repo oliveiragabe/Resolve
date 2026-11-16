@@ -1,20 +1,15 @@
 
 FROM php:8.4-apache
 
-# Dependências do sistema e extensões PHP
+# Dependências necessárias
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libicu-dev \
     libzip-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
     libonig-dev \
     unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
-        gd \
         intl \
         mbstring \
         pdo_pgsql \
@@ -26,25 +21,20 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Configuração do Apache
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
-RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/000-default.conf \
-    && sed -ri 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/apache2.conf \
-    && sed -ri '/<Directory \/var\/www\/html\/public>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' \
-    /etc/apache2/apache2.conf \
-    && sed -ri 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
-    && sed -ri 's/<VirtualHost \*:80>/<VirtualHost *:10000>/' \
-        /etc/apache2/sites-available/000-default.conf
-
 WORKDIR /var/www/html
 
-# Código da aplicação
+# Configuração do Apache
+RUN sed -ri 's!/var/www/html!/var/www/html/public!g' \
+    /etc/apache2/sites-available/000-default.conf \
+    && printf '\n<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n' \
+    >> /etc/apache2/apache2.conf \
+    && sed -ri 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
+    && sed -ri 's/<VirtualHost \*:80>/<VirtualHost *:10000>/' \
+    /etc/apache2/sites-available/000-default.conf
+
+# Aplicação Laravel
 COPY . .
 
-# Instalação das dependências
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
@@ -53,7 +43,7 @@ RUN composer install \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Inicialização do Render
+# Inicialização
 COPY docker-entrypoint-render.sh /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/docker-entrypoint-render.sh
