@@ -3,13 +3,19 @@ import 'package:flutter/material.dart';
 import '../constants/app_dimensions.dart';
 
 class AppTheme {
-  // Cores
+  // Cores principais
   static const Color background = Color(0xFF0D0D12);
   static const Color surface = Color(0xFF17171F);
   static const Color primary = Color(0xFF8B5CF6);
   static const Color textPrimary = Color(0xFFF4F4F5);
   static const Color textSecondary = Color(0xFFA1A1AA);
   static const Color border = Color(0xFF292934);
+
+  // Cores semânticas
+  static const Color success = Color(0xFF22C55E);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color danger = Color(0xFFEF4444);
+  static const Color muted = textSecondary;
 
   // Tipografia
   static const TextTheme textTheme = TextTheme(

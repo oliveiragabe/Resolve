@@ -2,21 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_strings.dart';
 import '../../core/constants/issue_options.dart';
 import '../../core/routes/app_routes.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
 import '../../widgets/issue_card.dart';
 
 class IssuesScreen extends StatefulWidget {
-  const IssuesScreen({super.key});
+  final IssueService? service;
+
+  const IssuesScreen({super.key, this.service});
 
   @override
   State<IssuesScreen> createState() => _IssuesScreenState();
 }
 
 class _IssuesScreenState extends State<IssuesScreen> {
-  final IssueService _issueService = IssueService();
+  late final IssueService _issueService = widget.service ?? IssueService();
+
   final TextEditingController _searchController = TextEditingController();
 
   late Future<List<Issue>> _issuesFuture;
@@ -50,7 +55,11 @@ class _IssuesScreenState extends State<IssuesScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _issueService.dispose();
+
+    if (widget.service == null) {
+      _issueService.dispose();
+    }
+
     super.dispose();
   }
 
@@ -79,7 +88,7 @@ class _IssuesScreenState extends State<IssuesScreen> {
           controller: _searchController,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
-            hintText: 'Pesquisar ocorrência ou projeto...',
+            hintText: AppStrings.searchHint,
             prefixIcon: const Icon(Icons.search),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
@@ -98,9 +107,12 @@ class _IssuesScreenState extends State<IssuesScreen> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedStatus,
-                decoration: const InputDecoration(labelText: 'Status'),
+                decoration: const InputDecoration(labelText: AppStrings.status),
                 items: [
-                  const DropdownMenuItem(value: 'todos', child: Text('Todos')),
+                  const DropdownMenuItem(
+                    value: 'todos',
+                    child: Text(AppStrings.all),
+                  ),
                   ...IssueOptions.statuses.map(
                     (option) => DropdownMenuItem<String>(
                       value: option['value'],
@@ -119,9 +131,14 @@ class _IssuesScreenState extends State<IssuesScreen> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedSeverity,
-                decoration: const InputDecoration(labelText: 'Severidade'),
+                decoration: const InputDecoration(
+                  labelText: AppStrings.severity,
+                ),
                 items: [
-                  const DropdownMenuItem(value: 'todas', child: Text('Todas')),
+                  const DropdownMenuItem(
+                    value: 'todas',
+                    child: Text(AppStrings.allFem),
+                  ),
                   ...IssueOptions.severities.map(
                     (option) => DropdownMenuItem<String>(
                       value: option['value'],
@@ -143,7 +160,7 @@ class _IssuesScreenState extends State<IssuesScreen> {
           child: TextButton.icon(
             onPressed: _clearFilters,
             icon: const Icon(Icons.filter_alt_off),
-            label: const Text('Limpar filtros'),
+            label: const Text(AppStrings.clearFilters),
           ),
         ),
       ],
@@ -154,12 +171,17 @@ class _IssuesScreenState extends State<IssuesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ocorrências'),
+        leading: IconButton(
+          onPressed: () => context.go('/'),
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Voltar ao painel',
+        ),
+        title: const Text(AppStrings.issuesTitle),
         actions: [
           IconButton(
             onPressed: _refreshIssues,
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: AppStrings.refresh,
           ),
         ],
       ),
@@ -181,11 +203,11 @@ class _IssuesScreenState extends State<IssuesScreen> {
                 children: [
                   const Icon(Icons.error_outline, size: 40),
                   const SizedBox(height: AppDimensions.spacingMD),
-                  const Text('Não foi possível carregar as ocorrências.'),
+                  const Text(AppStrings.loadIssuesListError),
                   const SizedBox(height: AppDimensions.spacingMD),
                   ElevatedButton(
                     onPressed: _refreshIssues,
-                    child: const Text('Tentar novamente'),
+                    child: const Text(AppStrings.tryAgain),
                   ),
                 ],
               ),
@@ -203,7 +225,7 @@ class _IssuesScreenState extends State<IssuesScreen> {
                 _buildFilters(),
                 const SizedBox(height: AppDimensions.spacingMD),
                 Text(
-                  '${filteredIssues.length} ocorrência(s) encontrada(s)',
+                  '${filteredIssues.length} ${AppStrings.issuesFound}',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: AppDimensions.spacingMD),
@@ -217,11 +239,13 @@ class _IssuesScreenState extends State<IssuesScreen> {
                         const Icon(
                           Icons.search_off,
                           size: 44,
-                          color: Colors.grey,
+                          color: AppTheme.muted,
                         ),
                         const SizedBox(height: AppDimensions.spacingMD),
                         Text(
-                          issues.isEmpty ? 'Nenhuma ocorrência cadastrada.' : 'Nenhuma ocorrência encontrada com esses filtros.',
+                          issues.isEmpty
+                              ? AppStrings.noIssuesRegistered
+                              : AppStrings.noIssuesFound,
                           textAlign: TextAlign.center,
                         ),
                       ],

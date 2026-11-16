@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_dimensions.dart';
+import '../core/constants/app_strings.dart';
+import '../core/constants/issue_options.dart';
 import '../core/theme/app_theme.dart';
 import '../models/issue.dart';
 
@@ -11,41 +13,29 @@ class IssueCard extends StatelessWidget {
   const IssueCard({super.key, required this.issue, required this.onTap});
 
   String _statusLabel(String status) {
-    switch (status) {
-      case 'aberto':
-        return 'Aberto';
-      case 'em_resolucao':
-        return 'Em resolução';
-      case 'fechado':
-        return 'Fechado';
-      default:
-        return status;
-    }
+    return IssueOptions.statuses.firstWhere(
+      (option) => option['value'] == status,
+      orElse: () => {'label': status},
+    )['label']!;
   }
 
   String _severityLabel(String severity) {
-    switch (severity) {
-      case 'baixa':
-        return 'Baixa';
-      case 'media':
-        return 'Média';
-      case 'critica':
-        return 'Crítica';
-      default:
-        return severity;
-    }
+    return IssueOptions.severities.firstWhere(
+      (option) => option['value'] == severity,
+      orElse: () => {'label': severity},
+    )['label']!;
   }
 
   Color _severityColor(String severity) {
     switch (severity) {
       case 'baixa':
-        return Colors.green;
+        return AppTheme.success;
       case 'media':
-        return Colors.orange;
+        return AppTheme.warning;
       case 'critica':
-        return Colors.redAccent;
+        return AppTheme.danger;
       default:
-        return AppTheme.textSecondary;
+        return AppTheme.muted;
     }
   }
 
@@ -68,12 +58,12 @@ class IssueCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Projeto: ${issue.project}',
+                '${AppStrings.projectLabel}${issue.project}',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: AppDimensions.spacingSM),
               Text(
-                'Status: ${_statusLabel(issue.status)}',
+                '${AppStrings.statusLabel}${_statusLabel(issue.status)}',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: AppDimensions.spacingSM),
@@ -89,7 +79,7 @@ class IssueCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppDimensions.spacingSM),
                   Text(
-                    'Severidade: ${_severityLabel(issue.severity)}',
+                    '${AppStrings.severityLabel}${_severityLabel(issue.severity)}',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],

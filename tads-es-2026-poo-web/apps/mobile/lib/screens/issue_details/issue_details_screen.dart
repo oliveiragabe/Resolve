@@ -2,22 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_strings.dart';
 import '../../core/constants/issue_options.dart';
 import '../../core/routes/app_routes.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
 
 class IssueDetailsScreen extends StatefulWidget {
   final int issueId;
+  final IssueService? service;
 
-  const IssueDetailsScreen({super.key, required this.issueId});
+  const IssueDetailsScreen({super.key, required this.issueId, this.service});
 
   @override
   State<IssueDetailsScreen> createState() => _IssueDetailsScreenState();
 }
 
 class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
-  final IssueService _issueService = IssueService();
+  late final IssueService _issueService = widget.service ?? IssueService();
 
   late Future<Issue> _issueFuture;
   bool _isUpdating = false;
@@ -34,7 +37,10 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
 
   @override
   void dispose() {
-    _issueService.dispose();
+    if (widget.service == null) {
+      _issueService.dispose();
+    }
+
     super.dispose();
   }
 
@@ -70,16 +76,16 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Status atualizado com sucesso!')),
+        const SnackBar(content: Text(AppStrings.updateStatusSuccess)),
       );
     } catch (e) {
       if (!mounted) return;
 
       setState(() => _isUpdating = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao atualizar status: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${AppStrings.updateStatusError}$e')),
+      );
     }
   }
 
@@ -87,16 +93,16 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Excluir ocorrência'),
-        content: const Text('Tem certeza que deseja excluir esta ocorrência?'),
+        title: const Text(AppStrings.deleteIssue),
+        content: const Text(AppStrings.confirmDelete),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: const Text(AppStrings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Excluir'),
+            child: const Text(AppStrings.deleteButton),
           ),
         ],
       ),
@@ -109,17 +115,16 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ocorrência excluída com sucesso!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.deleteSuccess)));
 
       context.goNamed(AppRoutes.issues);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao excluir ocorrência: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${AppStrings.deleteError}$e')));
     }
   }
 
@@ -146,7 +151,14 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes da ocorrência')),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.go('/'),
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Voltar ao painel',
+        ),
+        title: const Text(AppStrings.issueDetailsTitle),
+      ),
       body: FutureBuilder<Issue>(
         future: _issueFuture,
         builder: (context, snapshot) {
@@ -159,13 +171,13 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Não foi possível carregar a ocorrência.'),
+                  const Text(AppStrings.loadIssueDetailsError),
                   const SizedBox(height: AppDimensions.spacingMD),
                   ElevatedButton(
                     onPressed: () {
                       setState(_loadIssue);
                     },
-                    child: const Text('Tentar novamente'),
+                    child: const Text(AppStrings.tryAgain),
                   ),
                 ],
               ),
@@ -183,26 +195,26 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
               ),
               const SizedBox(height: AppDimensions.spacingLG),
 
-              _infoCard('Projeto', issue.project),
-              _infoCard('Severidade', _severityLabel(issue.severity)),
+              _infoCard(AppStrings.project, issue.project),
+              _infoCard(AppStrings.severity, _severityLabel(issue.severity)),
               _infoCard(
-                'Descrição',
+                AppStrings.description,
                 issue.description?.isNotEmpty == true
                     ? issue.description!
-                    : 'Sem descrição informada.',
+                    : AppStrings.noDescription,
               ),
 
               const SizedBox(height: AppDimensions.spacingLG),
 
               Text(
-                'Status da ocorrência',
+                AppStrings.issueStatus,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppDimensions.spacingSM),
 
               DropdownButtonFormField<String>(
                 initialValue: issue.status,
-                decoration: const InputDecoration(labelText: 'Status'),
+                decoration: const InputDecoration(labelText: AppStrings.status),
                 items: IssueOptions.statuses.map((option) {
                   return DropdownMenuItem<String>(
                     value: option['value'],
@@ -234,7 +246,7 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
                   );
                 },
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Editar ocorrência'),
+                label: const Text(AppStrings.editIssue),
               ),
 
               const SizedBox(height: AppDimensions.spacingXXL),
@@ -242,9 +254,9 @@ class _IssueDetailsScreenState extends State<IssueDetailsScreen> {
               OutlinedButton.icon(
                 onPressed: _deleteIssue,
                 icon: const Icon(Icons.delete_outline),
-                label: const Text('Excluir ocorrência'),
+                label: const Text(AppStrings.deleteIssue),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.redAccent,
+                  foregroundColor: AppTheme.danger,
                 ),
               ),
             ],

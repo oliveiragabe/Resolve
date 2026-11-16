@@ -1,7 +1,9 @@
+import '../constants/app_strings.dart';
+
 class Validators {
   static String? requiredField(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Este campo é obrigatório.';
+      return AppStrings.requiredField;
     }
 
     return null;
@@ -15,7 +17,7 @@ class Validators {
     }
 
     if (value!.trim().length < 3) {
-      return 'O título deve ter pelo menos 3 caracteres.';
+      return AppStrings.titleMinLength;
     }
 
     return null;

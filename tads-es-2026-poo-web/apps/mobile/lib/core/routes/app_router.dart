@@ -19,6 +19,12 @@ final GoRouter appRouter = GoRouter(
       name: AppRoutes.issues,
       builder: (context, state) => const IssuesScreen(),
     ),
+    // Nova ocorrência deve vir antes da rota dinâmica.
+    GoRoute(
+      path: '/issues/new',
+      name: AppRoutes.issueForm,
+      builder: (context, state) => const IssueFormScreen(),
+    ),
     GoRoute(
       path: '/issues/:id',
       name: AppRoutes.issueDetails,
@@ -26,11 +32,6 @@ final GoRouter appRouter = GoRouter(
         final id = int.parse(state.pathParameters['id']!);
         return IssueDetailsScreen(issueId: id);
       },
-    ),
-    GoRoute(
-      path: '/issues/new',
-      name: AppRoutes.issueForm,
-      builder: (context, state) => const IssueFormScreen(),
     ),
     GoRoute(
       path: '/issues/:id/edit',

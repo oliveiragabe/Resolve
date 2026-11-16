@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_strings.dart';
 import '../../core/constants/issue_options.dart';
-import '../../core/routes/app_routes.dart';
 import '../../core/utils/validators.dart';
 import '../../models/issue.dart';
 import '../../services/issue_service.dart';
 
 class IssueFormScreen extends StatefulWidget {
   final int? issueId;
+  final IssueService? service;
 
-  const IssueFormScreen({super.key, this.issueId});
+  const IssueFormScreen({super.key, this.issueId, this.service});
 
   @override
   State<IssueFormScreen> createState() => _IssueFormScreenState();
@@ -19,7 +20,9 @@ class IssueFormScreen extends StatefulWidget {
 
 class _IssueFormScreenState extends State<IssueFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _issueService = IssueService();
+
+  late final IssueService _issueService;
+  late final bool _ownsService;
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -38,6 +41,9 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
   @override
   void initState() {
     super.initState();
+
+    _ownsService = widget.service == null;
+    _issueService = widget.service ?? IssueService();
 
     _issueFuture = _isEditing ? _issueService.getById(widget.issueId!) : null;
   }
@@ -69,34 +75,31 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
     );
 
     try {
-      final savedIssue = _isEditing
-          ? await _issueService.update(widget.issueId!, issue)
-          : await _issueService.create(issue);
+      if (_isEditing) {
+        await _issueService.update(widget.issueId!, issue);
+      } else {
+        await _issueService.create(issue);
+      }
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isEditing
-                ? 'Ocorrência atualizada com sucesso!'
-                : 'Ocorrência criada com sucesso!',
+            _isEditing ? AppStrings.editSuccess : AppStrings.createSuccess,
           ),
         ),
       );
 
-      context.goNamed(
-        AppRoutes.issueDetails,
-        pathParameters: {'id': savedIssue.id.toString()},
-      );
+      // Após salvar, retorna diretamente ao dashboard.
+      context.go('/');
     } catch (e) {
       if (!mounted) return;
 
       setState(() => _isSaving = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao salvar ocorrência: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${AppStrings.saveError}$e')));
     }
   }
 
@@ -105,7 +108,11 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
     _titleController.dispose();
     _descriptionController.dispose();
     _projectController.dispose();
-    _issueService.dispose();
+
+    if (_ownsService) {
+      _issueService.dispose();
+    }
+
     super.dispose();
   }
 
@@ -116,14 +123,16 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
         padding: const EdgeInsets.all(AppDimensions.spacingXL),
         children: [
           Text(
-            _isEditing ? 'Editar ocorrência' : 'Nova ocorrência',
+            _isEditing
+                ? AppStrings.editIssueTitle
+                : AppStrings.createIssueTitle,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: AppDimensions.spacingSM),
           Text(
             _isEditing
-                ? 'Atualize as informações da ocorrência.'
-                : 'Preencha os dados para registrar uma ocorrência.',
+                ? AppStrings.editIssueDescription
+                : AppStrings.createIssueDescription,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: AppDimensions.spacingXXL),
@@ -131,8 +140,8 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
           TextFormField(
             controller: _titleController,
             decoration: const InputDecoration(
-              labelText: 'Título',
-              hintText: 'Ex.: Erro ao salvar usuário',
+              labelText: AppStrings.title,
+              hintText: AppStrings.titleHint,
               prefixIcon: Icon(Icons.title),
             ),
             validator: Validators.title,
@@ -142,8 +151,8 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
           TextFormField(
             controller: _descriptionController,
             decoration: const InputDecoration(
-              labelText: 'Descrição',
-              hintText: 'Descreva o problema encontrado...',
+              labelText: AppStrings.description,
+              hintText: AppStrings.descriptionHint,
               prefixIcon: Icon(Icons.description_outlined),
               alignLabelWithHint: true,
             ),
@@ -155,8 +164,8 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
           TextFormField(
             controller: _projectController,
             decoration: const InputDecoration(
-              labelText: 'Projeto',
-              hintText: 'Ex.: Resolve',
+              labelText: AppStrings.project,
+              hintText: AppStrings.projectHint,
               prefixIcon: Icon(Icons.folder_outlined),
             ),
             validator: Validators.requiredField,
@@ -166,7 +175,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
           DropdownButtonFormField<String>(
             initialValue: _severity,
             decoration: const InputDecoration(
-              labelText: 'Severidade',
+              labelText: AppStrings.severity,
               prefixIcon: Icon(Icons.flag_outlined),
             ),
             items: IssueOptions.severities.map((option) {
@@ -186,7 +195,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
           DropdownButtonFormField<String>(
             initialValue: _status,
             decoration: const InputDecoration(
-              labelText: 'Status',
+              labelText: AppStrings.status,
               prefixIcon: Icon(Icons.pending_outlined),
             ),
             items: IssueOptions.statuses.map((option) {
@@ -213,14 +222,14 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
                   )
                 : const Icon(Icons.save_outlined),
             label: Text(
-              _isEditing ? 'Salvar alterações' : 'Cadastrar ocorrência',
+              _isEditing ? AppStrings.saveChanges : AppStrings.registerIssue,
             ),
           ),
           const SizedBox(height: AppDimensions.spacingMD),
 
           OutlinedButton(
-            onPressed: _isSaving ? null : () => context.pop(),
-            child: const Text('Cancelar'),
+            onPressed: _isSaving ? null : () => context.go('/'),
+            child: const Text(AppStrings.cancel),
           ),
         ],
       ),
@@ -231,13 +240,27 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
   Widget build(BuildContext context) {
     if (!_isEditing) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Nova ocorrência')),
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () => context.go('/'),
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Voltar ao painel',
+          ),
+          title: const Text(AppStrings.createIssueTitle),
+        ),
         body: _buildForm(),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar ocorrência')),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.go('/'),
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Voltar ao painel',
+        ),
+        title: const Text(AppStrings.editIssueTitle),
+      ),
       body: FutureBuilder<Issue>(
         future: _issueFuture,
         builder: (context, snapshot) {
@@ -246,9 +269,7 @@ class _IssueFormScreenState extends State<IssueFormScreen> {
           }
 
           if (snapshot.hasError || !snapshot.hasData) {
-            return const Center(
-              child: Text('Não foi possível carregar a ocorrência.'),
-            );
+            return const Center(child: Text(AppStrings.loadIssueError));
           }
 
           _fillForm(snapshot.data!);
