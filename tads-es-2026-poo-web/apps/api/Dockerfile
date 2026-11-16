@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
         intl \
         mbstring \
         pdo_pgsql \
-        pdo_sqlite \
         zip \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
@@ -43,7 +42,7 @@ RUN composer install \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Inicialização
+# Script de inicialização
 COPY docker-entrypoint-render.sh /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/docker-entrypoint-render.sh
